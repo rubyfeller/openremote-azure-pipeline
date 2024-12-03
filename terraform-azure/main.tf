@@ -128,7 +128,7 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/openremote_azurekey.pub")
+    public_key = var.ssh_public_key
   }
 
   os_disk {
