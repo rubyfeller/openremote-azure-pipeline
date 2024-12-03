@@ -33,9 +33,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Test Azure connection
-        run: az account show
-
+      - name: Ensure Resource Group and Storage Account Exist
+        run: |
+          # Create resource group if it doesn't exist
+          az group show --name ${{ secrets.RESOURCE_GROUP_NAME }} || \
+          az group create --name ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ secrets.AZURE_LOCATION }}
+        
+          # Create storage account if it doesn't exist
+          az storage account show --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} || \
+          az storage account create --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ secrets.AZURE_LOCATION }} --sku Standard_LRS
+        
       - name: Terraform Init
         id: init
         env:
