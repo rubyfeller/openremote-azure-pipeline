@@ -1,24 +1,20 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=4.11.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  subscription_id = var.subscription_id
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-}
-
 resource "azurerm_resource_group" "openremote-rg" {
   name     = "openremote-rg"
   location = "Central India"
+}
+
+resource "azurerm_storage_account" "openremote-storage" {
+  name                     = "openremotestorage"
+  resource_group_name      = azurerm_resource_group.openremote-rg.name
+  location                 = azurerm_resource_group.openremote-rg.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "openremote-container" {
+  name                  = "tfstate"
+  storage_account_id    = azurerm_storage_account.openremote-storage.id
+  container_access_type = "private"
 }
 
 resource "azurerm_virtual_network" "openremote-vn" {
@@ -150,4 +146,8 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
 
 output "instance_details" {
   value = "${azurerm_linux_virtual_machine.openremote-vm.name}: ${azurerm_public_ip.openremote-ip.ip_address}"
+}
+
+output "blob_storage_container" {
+  value = azurerm_storage_container.openremote-container.name
 }
