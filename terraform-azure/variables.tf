@@ -7,3 +7,8 @@ variable "ssh_source_ip" {
   description = "IP address allowed for SSH access"
   type        = string
 }
+
+variable "ssh_public_key" {
+  description = "Public SSH key for VM access"
+  type        = string
+}

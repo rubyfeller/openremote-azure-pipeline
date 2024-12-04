@@ -1,21 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "=4.11.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  subscription_id = var.subscription_id
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-}
-
 resource "azurerm_resource_group" "openremote-rg" {
   name     = "openremote-rg"
   location = "Central India"
@@ -132,7 +114,7 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/openremote_azurekey.pub")
+    public_key = var.ssh_public_key
   }
 
   os_disk {
