@@ -1,4 +1,4 @@
-data "azurerm_resource_group" "openremote-rg" {
+resource "azurerm_resource_group" "openremote-rg" {
   name     = "openremote-rg"
   location = "Central India"
 }
