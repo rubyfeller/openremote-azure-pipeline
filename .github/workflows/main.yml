@@ -44,7 +44,7 @@ jobs:
           az storage account create --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ secrets.AZURE_LOCATION }} --sku Standard_LRS
         
           # Create storage container if it doesn't exist
-          az storage container show --name ${{ secrets.CONTAINER_NAME }} --account-name ${{ secrets.STORAGE_ACCOUNT }} || \
+          az storage container show --name ${{ secrets.CONTAINER_NAME }} --account-name ${{ secrets.STORAGE_ACCOUNT }} --auth-mode login || \
           az storage container create --name ${{ secrets.CONTAINER_NAME }} --account-name ${{ secrets.STORAGE_ACCOUNT }} --auth-mode login
           
       - name: Terraform Init
