@@ -51,7 +51,7 @@ resource "azurerm_network_security_rule" "openremote-http" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "80"
-  source_address_prefix       = "*"
+  source_address_prefix       = "10.123.2.0/24"
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.openremote-rg.name
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
@@ -68,7 +68,7 @@ resource "azurerm_network_security_rule" "openremote-https" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "443"
-  source_address_prefix       = "*"
+  source_address_prefix       = "10.123.2.0/24"
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.openremote-rg.name
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
@@ -77,14 +77,6 @@ resource "azurerm_network_security_rule" "openremote-https" {
 resource "azurerm_subnet_network_security_group_association" "openremote-sga" {
   subnet_id                 = azurerm_subnet.openremote-subnet.id
   network_security_group_id = azurerm_network_security_group.openremote-sg.id
-}
-
-resource "azurerm_public_ip" "openremote-ip" {
-  name                = "openremote-ip"
-  resource_group_name = azurerm_resource_group.openremote-rg.name
-  location            = azurerm_resource_group.openremote-rg.location
-  allocation_method   = "Dynamic"
-  sku                 = "Basic"
 }
 
 resource "azurerm_network_interface" "openremote-nic" {
@@ -96,7 +88,6 @@ resource "azurerm_network_interface" "openremote-nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.openremote-subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.openremote-ip.id
   }
 }
 
@@ -106,6 +97,8 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
   location            = azurerm_resource_group.openremote-rg.location
   size                = "Standard_B2s"
   admin_username      = "adminuser"
+  provision_vm_agent = false
+
   network_interface_ids = [
     azurerm_network_interface.openremote-nic.id,
   ]
