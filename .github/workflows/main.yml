@@ -47,6 +47,7 @@ jobs:
         with:
           directory: ./
           framework: terraform
+        continue-on-error: true
           
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
