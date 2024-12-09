@@ -1,4 +1,5 @@
 resource "azurerm_monitor_action_group" "email_alert" {
+  count               = var.enable_monitoring ? 1 : 0
   name                = "email-alert-group"
   resource_group_name = azurerm_resource_group.openremote-rg.name
   short_name          = "emailalert"
@@ -10,6 +11,7 @@ resource "azurerm_monitor_action_group" "email_alert" {
 }
 
 resource "azurerm_monitor_metric_alert" "vm_cpu_alert" {
+  count               = var.enable_monitoring ? 1 : 0
   name                = "vm-high-cpu-alert"
   resource_group_name = azurerm_resource_group.openremote-rg.name
   scopes              = [azurerm_linux_virtual_machine.openremote-vm.id]
@@ -24,6 +26,6 @@ resource "azurerm_monitor_metric_alert" "vm_cpu_alert" {
   }
 
   action {
-    action_group_id = azurerm_monitor_action_group.email_alert.id
+    action_group_id = azurerm_monitor_action_group.email_alert[0].id
   }
 }

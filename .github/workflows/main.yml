@@ -1,6 +1,17 @@
 name: Deploy OpenRemote
 on:
   workflow_dispatch:
+    inputs:
+      enable_backups:
+        description: 'Enable backups'
+        required: true
+        default: false
+        type: boolean
+      enable_monitoring:
+        description: 'Enable monitoring'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   id-token: write
@@ -87,7 +98,7 @@ jobs:
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        run: terraform plan -no-color
+        run: terraform plan -no-color -var="enable_backups=${{ github.event.inputs.enable_backups }}" -var="enable_monitoring=${{ github.event.inputs.enable_monitoring }}"
         continue-on-error: true
       
       - name: Terraform Apply
@@ -99,5 +110,5 @@ jobs:
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        run: terraform apply -auto-approve -no-color
+        run: terraform apply -no-color -auto-approve -var="enable_backups=${{ github.event.inputs.enable_backups }}" -var="enable_monitoring=${{ github.event.inputs.enable_monitoring }}"
         continue-on-error: true

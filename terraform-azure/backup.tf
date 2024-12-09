@@ -1,4 +1,5 @@
 resource "azurerm_recovery_services_vault" "openremote-backup-vault" {
+  count               = var.enable_backups ? 1 : 0
   name                = "openremote-backup-vault"
   location            = azurerm_resource_group.openremote-rg.location
   resource_group_name = azurerm_resource_group.openremote-rg.name
@@ -8,9 +9,10 @@ resource "azurerm_recovery_services_vault" "openremote-backup-vault" {
 }
 
 resource "azurerm_backup_policy_vm" "daily-backup-policy" {
+  count               = var.enable_backups ? 1 : 0
   name                = "daily-backup-policy"
   resource_group_name = azurerm_resource_group.openremote-rg.name
-  recovery_vault_name = azurerm_recovery_services_vault.openremote-backup-vault.name
+  recovery_vault_name = azurerm_recovery_services_vault.openremote-backup-vault[0].name
 
   backup {
     frequency = "Daily"
@@ -34,8 +36,9 @@ resource "azurerm_backup_policy_vm" "daily-backup-policy" {
 }
 
 resource "azurerm_backup_protected_vm" "openremote-backup" {
+  count               = var.enable_backups ? 1 : 0
   resource_group_name = azurerm_resource_group.openremote-rg.name
-  recovery_vault_name = azurerm_recovery_services_vault.openremote-backup-vault.name
+  recovery_vault_name = azurerm_recovery_services_vault.openremote-backup-vault[0].name
   source_vm_id        = azurerm_linux_virtual_machine.openremote-vm.id
-  backup_policy_id    = azurerm_backup_policy_vm.daily-backup-policy.id
+  backup_policy_id    = azurerm_backup_policy_vm.daily-backup-policy[0].id
 }

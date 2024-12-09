@@ -17,3 +17,15 @@ variable "alert_email_address" {
   description = "Email address to receive alerts"
   type        = string
 }
+
+variable "enable_backups" {
+  description = "Enable backups"
+  type        = bool
+  default     = false
+}
+
+variable "enable_monitoring" {
+  description = "Enable monitoring"
+  type        = bool
+  default     = false
+}
