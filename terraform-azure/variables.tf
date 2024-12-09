@@ -12,3 +12,8 @@ variable "ssh_public_key" {
   description = "Public SSH key for VM access"
   type        = string
 }
+
+variable "alert_email_address" {
+  description = "Email address to receive alerts"
+  type        = string
+}
