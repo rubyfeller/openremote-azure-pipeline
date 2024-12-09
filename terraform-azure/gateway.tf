@@ -67,4 +67,6 @@ resource "azurerm_application_gateway" "openremote-application-gateway" {
         backend_address_pool_name           = "application-gateway-backend-pool"
         backend_http_settings_name          = "application-gateway-backend-HTTP-settings"
     }
+
+    depends_on = [ azurerm_public_ip.openremote-ip, azurerm_network_interface.openremote-nic ]
 }

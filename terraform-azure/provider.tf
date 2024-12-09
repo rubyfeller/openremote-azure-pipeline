@@ -5,10 +5,6 @@ terraform {
       version = "=4.11.0"
     }
   }
-
-  backend "local" {
-    path = "terraform.tfstate"
-  }
 }
 
 
