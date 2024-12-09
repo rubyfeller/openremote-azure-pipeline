@@ -39,3 +39,15 @@ resource "azurerm_backup_protected_vm" "openremote-backup" {
   source_vm_id        = azurerm_linux_virtual_machine.openremote-vm.id
   backup_policy_id    = azurerm_backup_policy_vm.daily-backup-policy.id
 }
+
+resource "azurerm_recovery_services_vault" "openremote-backup-vault" {
+  name                = "openremote-backup-vault"
+  location            = azurerm_resource_group.openremote-rg.location
+  resource_group_name = azurerm_resource_group.openremote-rg.name
+  sku                 = "Standard"
+  soft_delete_enabled = true
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
