@@ -31,8 +31,7 @@ jobs:
         with:
           directory: ./
           framework: terraform
-    
-
+          
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
         with:
