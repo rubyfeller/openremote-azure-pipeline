@@ -29,3 +29,9 @@ variable "enable_monitoring" {
   type        = bool
   default     = false
 }
+
+variable "region" {
+  description = "Azure region"
+  type        = string
+  default     = "Central India"
+}

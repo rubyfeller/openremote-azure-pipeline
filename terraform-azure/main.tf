@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "openremote-rg" {
   name     = "openremote-rg"
-  location = "Central India"
+  location = var.region
 }
 
 resource "azurerm_virtual_network" "openremote-vn" {
