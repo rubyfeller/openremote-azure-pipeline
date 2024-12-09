@@ -45,7 +45,7 @@ resource "azurerm_recovery_services_vault" "openremote-backup-vault" {
   location            = azurerm_resource_group.openremote-rg.location
   resource_group_name = azurerm_resource_group.openremote-rg.name
   sku                 = "Standard"
-  soft_delete_enabled = true
+  soft_delete_enabled = false
 
   identity {
     type = "SystemAssigned"

@@ -96,7 +96,7 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
   location            = azurerm_resource_group.openremote-rg.location
   size                = "Standard_B2s"
   admin_username      = "adminuser"
-  provision_vm_agent = true
+  provision_vm_agent  = true
 
   network_interface_ids = [
     azurerm_network_interface.openremote-nic.id,
