@@ -5,6 +5,12 @@ resource "azurerm_subnet" "openremote-application-gateway-subnet" {
   address_prefixes     = ["10.123.2.0/24"]
 }
 
+resource "azurerm_network_security_group" "openremote-application-gateway-nsg" {
+  name                = "openremote-application-gateway-security-group"
+  resource_group_name = azurerm_resource_group.openremote-rg.name
+  location            = azurerm_resource_group.openremote-rg.location
+}
+
 resource "azurerm_public_ip" "openremote-ip" {
   name                = "openremote-ip"
   resource_group_name = azurerm_resource_group.openremote-rg.name
@@ -19,9 +25,16 @@ resource "azurerm_application_gateway" "openremote-application-gateway" {
     location = azurerm_resource_group.openremote-rg.location
 
     sku {
-        name     = "Standard_v2"
-        tier     = "Standard_v2"
+        name     = "WAF_v2"
+        tier     = "WAF_v2"
         capacity = 2
+    }
+
+    waf_configuration {
+        enabled = true
+        firewall_mode = "Prevention"
+        rule_set_type = "OWASP"
+        rule_set_version = "3.2"
     }
 
     gateway_ip_configuration {
@@ -69,4 +82,9 @@ resource "azurerm_application_gateway" "openremote-application-gateway" {
     }
 
     depends_on = [ azurerm_public_ip.openremote-ip, azurerm_network_interface.openremote-nic ]
+}
+
+resource "azurerm_subnet_network_security_group_association" "openremote-application-gateway-sga" {
+  subnet_id                 = azurerm_subnet.openremote-application-gateway-subnet.id
+  network_security_group_id = azurerm_network_security_group.openremote-application-gateway-nsg.id
 }
