@@ -104,7 +104,7 @@ jobs:
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        run: terraform plan -no-color -var="enable_backups=${{ github.event.inputs.enable_backups }}" -var="enable_monitoring=${{ github.event.inputs.enable_monitoring }} -var="region=${{ github.event.inputs.region }}"
+        run: terraform plan -no-color -var="enable_backups=${{ github.event.inputs.enable_backups }}" -var="enable_monitoring=${{ github.event.inputs.enable_monitoring }}" -var="region=${{ github.event.inputs.region }}"
         continue-on-error: true
       
       - name: Terraform Apply
@@ -116,5 +116,5 @@ jobs:
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-        run: terraform apply -no-color -auto-approve -var="enable_backups=${{ github.event.inputs.enable_backups }}" -var="enable_monitoring=${{ github.event.inputs.enable_monitoring }} -var="region=${{ github.event.inputs.region }}"
+        run: terraform apply -no-color -auto-approve -var="enable_backups=${{ github.event.inputs.enable_backups }}" -var="enable_monitoring=${{ github.event.inputs.enable_monitoring }}" -var="region=${{ github.event.inputs.region }}"
         continue-on-error: true
