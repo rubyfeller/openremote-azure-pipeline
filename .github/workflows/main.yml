@@ -69,11 +69,11 @@ jobs:
         run: |
           # Create resource group if it doesn't exist
           az group show --name ${{ secrets.RESOURCE_GROUP_NAME }} || \
-          az group create --name ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ secrets.AZURE_LOCATION }}
+          az group create --name ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ github.event.inputs.region }}
         
           # Create storage account if it doesn't exist
           az storage account show --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} || \
-          az storage account create --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ secrets.AZURE_LOCATION }} --sku Standard_LRS
+          az storage account create --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ github.event.inputs.region }} --sku Standard_LRS
         
           # Create storage container if it doesn't exist
           az storage container show --name ${{ secrets.CONTAINER_NAME }} --account-name ${{ secrets.STORAGE_ACCOUNT }} --auth-mode login || \
