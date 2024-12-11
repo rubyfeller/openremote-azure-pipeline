@@ -20,7 +20,7 @@ on:
       region:
         description: 'Azure region'
         required: true
-        default: 'Central India'
+        default: 'centralindia'
         type: string
       email:
         description: 'Email address for metric alerts'
@@ -75,10 +75,6 @@ jobs:
           RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}-rg"
           STORAGE_ACCOUNT="${{ github.event.inputs.customer_name }}storage"
           CONTAINER_NAME="${{ github.event.inputs.customer_name }}container"
-          
-          echo "RESOURCE_GROUP_NAME=$RESOURCE_GROUP_NAME"
-          echo "STORAGE_ACCOUNT=$STORAGE_ACCOUNT"
-          echo "CONTAINER_NAME=$CONTAINER_NAME"
 
           # Create resource group if it doesn't exist
           az group show --name $RESOURCE_GROUP_NAME || \

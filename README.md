@@ -17,6 +17,7 @@ The [Abbreviation recommendations for Azure resources](https://learn.microsoft.c
 ```sh
 git clone https://github.com/openremote/openremote-azure-pipeline.git
 cd openremote-azure-pipeline
+cd terraform-azure
 ```
 
 ## Step 2: Configure Azure CLI
@@ -76,7 +77,7 @@ terraform {
 }
 ```
 
-This configures Terraform to use a local backend for state mangement. It makes sure the remote state isn't effected.
+This configures Terraform to use a local backend for state mangement. It makes sure the remote state isn't affected.
 
 ## Step 8: Apply Terraform Configuration
 

@@ -1,6 +1,6 @@
 terraform {
   backend "azurerm" {
-    key      = "${var.customer_name}/terraform.tfstate"
+    key      = "terraform.tfstate"
     use_oidc = true
   }
 }
