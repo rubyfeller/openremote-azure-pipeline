@@ -2,6 +2,11 @@ name: Deploy OpenRemote
 on:
   workflow_dispatch:
     inputs:
+      customer_name:
+        description: 'Customer name'
+        required: true
+        default: 'openremote'
+        type: string
       enable_backups:
         description: 'Enable backups'
         required: true
@@ -67,24 +72,28 @@ jobs:
 
       - name: Ensure Resource Group, Storage Account and Container Exist
         run: |
+          RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}-rg"
+          STORAGE_ACCOUNT="${{ github.event.inputs.customer_name }}storage"
+          CONTAINER_NAME="${{ github.event.inputs.customer_name }}container"
+
           # Create resource group if it doesn't exist
-          az group show --name ${{ secrets.RESOURCE_GROUP_NAME }} || \
-          az group create --name ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ github.event.inputs.region }}
+          az group show --name $RESOURCE_GROUP_NAME || \
+          az group create --name $RESOURCE_GROUP_NAME --location ${{ github.event.inputs.region }}
         
           # Create storage account if it doesn't exist
-          az storage account show --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} || \
-          az storage account create --name ${{ secrets.STORAGE_ACCOUNT }} --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} --location ${{ github.event.inputs.region }} --sku Standard_LRS
+          az storage account show --name $STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP_NAME || \
+          az storage account create --name $STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP_NAME --location ${{ github.event.inputs.region }} --sku Standard_LRS
         
           # Create storage container if it doesn't exist
-          az storage container show --name ${{ secrets.CONTAINER_NAME }} --account-name ${{ secrets.STORAGE_ACCOUNT }} --auth-mode login || \
-          az storage container create --name ${{ secrets.CONTAINER_NAME }} --account-name ${{ secrets.STORAGE_ACCOUNT }} --auth-mode login
+          az storage container show --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login || \
+          az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login
           
       - name: Terraform Init
         id: init
         env:
-          STORAGE_ACCOUNT: ${{ secrets.STORAGE_ACCOUNT }}
-          CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-          RESOURCE_GROUP_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
+          STORAGE_ACCOUNT: ${{ github.event.inputs.customer_name }}storage
+          CONTAINER_NAME: ${{ github.event.inputs.customer_name }}container
+          RESOURCE_GROUP_NAME: ${{ github.event.inputs.customer_name }}-rg
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -105,6 +114,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_customer_name: ${{ github.event.inputs.customer_name }}
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
@@ -121,6 +131,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_customer_name: ${{ github.event.inputs.customer_name }}
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}

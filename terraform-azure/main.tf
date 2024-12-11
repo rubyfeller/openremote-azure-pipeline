@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "openremote-rg" {
-  name     = "openremote-rg"
+  name     = "${var.customer_name}-rg"
   location = var.region
 }
 
