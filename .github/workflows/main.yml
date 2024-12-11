@@ -72,7 +72,7 @@ jobs:
 
       - name: Ensure Resource Group, Storage Account and Container Exist
         run: |
-          RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}-rg"
+          RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}tfstate-rg"
           STORAGE_ACCOUNT="${{ github.event.inputs.customer_name }}storage"
           CONTAINER_NAME="${{ github.event.inputs.customer_name }}container"
 
