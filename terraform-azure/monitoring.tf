@@ -43,7 +43,8 @@ resource "azurerm_monitor_metric_alert" "vm_cpu_alert" {
   }
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "memory_alert" {
+resource "azurerm_monitor_scheduled_query_rules_alert" "vm_memory_alert" {
+  count               = var.enable_monitoring ? 1 : 0
   name                = "vm-high-memory-alert"
   location            = azurerm_resource_group.openremote-rg.location
   resource_group_name = azurerm_resource_group.openremote-rg.name
@@ -53,16 +54,16 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "memory_alert" {
   }
 
   data_source_id = azurerm_log_analytics_workspace.openremote-law.id
-  description = "Alert when available memory is below 20%"
+  description = "Alert when available memory is below 500 MB"
   enabled     = true
 
   query = <<-QUERY
     Perf
     | where TimeGenerated >= ago(15m)
-    | where Namespace == "Memory"
-    | where Name == "AvailableMemory"
-    | summarize AggregatedValue = avg(Val) by bin(TimeGenerated, 5m)
-    | where AggregatedValue < 20
+    | where ObjectName == "Memory"
+    | where CounterName == "Available MBytes Memory"
+    | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m)
+    | where AggregatedValue < 500
   QUERY
 
   severity    = 3
@@ -75,7 +76,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "memory_alert" {
   }
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "disk_alert" {
+resource "azurerm_monitor_scheduled_query_rules_alert" "vm_disk_alert" {
+  count               = var.enable_monitoring ? 1 : 0
   name                = "vm-low-disk-space-alert"
   location            = azurerm_resource_group.openremote-rg.location
   resource_group_name = azurerm_resource_group.openremote-rg.name
@@ -92,6 +94,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "disk_alert" {
     Perf
     | where TimeGenerated >= ago(15m)
     | where ObjectName == "LogicalDisk" and CounterName == "% Free Space"
+    | where InstanceName == "/"
     | summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 5m)
     | where AggregatedValue < 20
   QUERY
