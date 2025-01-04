@@ -17,6 +17,11 @@ on:
         required: true
         default: false
         type: boolean
+      admin_account:
+        description: 'Enable creation of additional admin account'
+        required: true
+        default: false
+        type: boolean
       region:
         description: 'Azure region'
         required: true
@@ -120,6 +125,7 @@ jobs:
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
           TF_VAR_enable_backups: ${{ github.event.inputs.enable_backups }}
           TF_VAR_enable_monitoring: ${{ github.event.inputs.enable_monitoring }}
+          TF_VAR_enable_admin_account: ${{ github.event.inputs.admin_account }}
           TF_VAR_region: ${{ github.event.inputs.region }}
           TF_VAR_alert_email_address: ${{ github.event.inputs.email }}
         run: terraform plan -no-color
@@ -137,6 +143,7 @@ jobs:
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
           TF_VAR_enable_backups: ${{ github.event.inputs.enable_backups }}
           TF_VAR_enable_monitoring: ${{ github.event.inputs.enable_monitoring }}
+          TF_VAR_enable_admin_account: ${{ github.event.inputs.admin_account }}
           TF_VAR_region: ${{ github.event.inputs.region }}
           TF_VAR_alert_email_address: ${{ github.event.inputs.email }}
         run: terraform apply -no-color -auto-approve
