@@ -54,8 +54,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "vm_memory_alert" {
   }
 
   data_source_id = azurerm_log_analytics_workspace.openremote-law.id
-  description = "Alert when available memory is below 500 MB"
-  enabled     = true
+  description    = "Alert when available memory is below 500 MB"
+  enabled        = true
 
   query = <<-QUERY
     Perf
