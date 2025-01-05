@@ -51,6 +51,12 @@ variable "enable_admin_account" {
   default     = false
 }
 
+variable "enable_private_vm_setup" {
+  description = "Enable private VM setup"
+  type        = bool
+  default     = false
+}
+
 variable "region" {
   description = "Azure region"
   type        = string

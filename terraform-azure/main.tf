@@ -100,7 +100,7 @@ resource "azurerm_network_security_rule" "openremote-dev-rule" {
   protocol                    = "*"
   source_port_range           = "*"
   destination_port_range      = "22"
-  source_address_prefix       = "VirtualNetwork"
+  source_address_prefix       = var.enable_private_vm_setup ? "VirtualNetwork" : var.ssh_source_ip
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.openremote-rg.name
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
@@ -117,7 +117,7 @@ resource "azurerm_network_security_rule" "openremote-http" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "80"
-  source_address_prefix       = "AzureLoadBalancer"
+  source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.openremote-rg.name
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
@@ -134,7 +134,7 @@ resource "azurerm_network_security_rule" "openremote-https" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "443"
-  source_address_prefix       = "AzureLoadBalancer"
+  source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.openremote-rg.name
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
@@ -147,7 +147,7 @@ resource "azurerm_network_security_rule" "openremote-mqtt" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "8883"
-  source_address_prefix       = "AzureLoadBalancer"
+  source_address_prefix       = "*"
   destination_address_prefix  = "*"
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
   resource_group_name         = azurerm_resource_group.openremote-rg.name
@@ -161,7 +161,7 @@ resource "azurerm_network_security_rule" "openremote-smtp" {
   protocol                    = "Tcp"
   source_port_range           = "*"
   destination_port_range      = "25"
-  source_address_prefix       = "AzureLoadBalancer"
+  source_address_prefix       = "*"
   destination_address_prefix  = "*"
   network_security_group_name = azurerm_network_security_group.openremote-sg.name
   resource_group_name         = azurerm_resource_group.openremote-rg.name
@@ -172,13 +172,14 @@ resource "azurerm_subnet_network_security_group_association" "openremote-sga" {
   network_security_group_id = azurerm_network_security_group.openremote-sg.id
 }
 
-/* resource "azurerm_public_ip" "openremote-ip" {
+resource "azurerm_public_ip" "openremote-ip" {
+  count               = var.enable_private_vm_setup ? 0 : 1
   name                = "openremote-ip"
   resource_group_name = azurerm_resource_group.openremote-rg.name
   location            = azurerm_resource_group.openremote-rg.location
   allocation_method   = "Dynamic"
   sku                 = "Basic"
-} */
+}
 
 resource "azurerm_network_interface" "openremote-nic" {
   name                = "openremote-nic"
@@ -189,14 +190,15 @@ resource "azurerm_network_interface" "openremote-nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.openremote-subnet.id
     private_ip_address_allocation = "Dynamic"
-    # public_ip_address_id          = azurerm_public_ip.openremote-ip.id
+    public_ip_address_id          = var.enable_private_vm_setup ? null : azurerm_public_ip.openremote-ip[0].id
   }
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "openremote-nic-backend-pool" {
+  count                   = var.enable_private_vm_setup ? 1 : 0
   network_interface_id    = azurerm_network_interface.openremote-nic.id
   ip_configuration_name   = azurerm_network_interface.openremote-nic.ip_configuration[0].name
-  backend_address_pool_id = azurerm_lb_backend_address_pool.openremote-lb-pool.id
+  backend_address_pool_id = azurerm_lb_backend_address_pool.openremote-lb-pool[count.index].id
 }
 
 resource "azurerm_linux_virtual_machine" "openremote-vm" {
@@ -229,6 +231,14 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
   }
 }
 
-/* output "instance_details" {
-  value = "${azurerm_linux_virtual_machine.openremote-vm.name}: ${azurerm_public_ip.openremote-ip.ip_address}"
-} */
+output "instance_details" { # BUG: Public ip is not showing
+  value = var.enable_private_vm_setup ? {
+    name       = azurerm_linux_virtual_machine.openremote-vm.name
+    public_ip  = azurerm_public_ip.openremote-lb-ip[0].ip_address
+    private_ip = azurerm_network_interface.openremote-nic.private_ip_address
+    } : {
+    name       = azurerm_linux_virtual_machine.openremote-vm.name
+    public_ip  = azurerm_public_ip.openremote-ip[0].ip_address
+    private_ip = azurerm_network_interface.openremote-nic.private_ip_address
+  }
+} 

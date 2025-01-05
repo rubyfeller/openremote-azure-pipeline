@@ -17,8 +17,13 @@ on:
         required: true
         default: false
         type: boolean
+      enable_private_vm_setup:
+        description: 'Enable private VM setup'
+        required: true
+        default: false
+        type: boolean
       admin_account:
-        description: 'Enable creation of additional admin account'
+        description: 'Create an additional admin account'
         required: true
         default: false
         type: boolean
@@ -126,6 +131,7 @@ jobs:
           TF_VAR_enable_backups: ${{ github.event.inputs.enable_backups }}
           TF_VAR_enable_monitoring: ${{ github.event.inputs.enable_monitoring }}
           TF_VAR_enable_admin_account: ${{ github.event.inputs.admin_account }}
+          TF_VAR_enable_private_vm_setup: ${{ github.event.inputs.enable_private_vm_setup }}
           TF_VAR_region: ${{ github.event.inputs.region }}
           TF_VAR_alert_email_address: ${{ github.event.inputs.email }}
         run: terraform plan -no-color
@@ -144,6 +150,7 @@ jobs:
           TF_VAR_enable_backups: ${{ github.event.inputs.enable_backups }}
           TF_VAR_enable_monitoring: ${{ github.event.inputs.enable_monitoring }}
           TF_VAR_enable_admin_account: ${{ github.event.inputs.admin_account }}
+          TF_VAR_enable_private_vm_setup: ${{ github.event.inputs.enable_private_vm_setup }}
           TF_VAR_region: ${{ github.event.inputs.region }}
           TF_VAR_alert_email_address: ${{ github.event.inputs.email }}
         run: terraform apply -no-color -auto-approve
