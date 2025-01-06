@@ -231,14 +231,12 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
   }
 }
 
-output "instance_details" { # BUG: Public ip is not showing
+output "instance_details" {
   value = var.enable_private_vm_setup ? {
     name       = azurerm_linux_virtual_machine.openremote-vm.name
-    public_ip  = azurerm_public_ip.openremote-lb-ip[0].ip_address
     private_ip = azurerm_network_interface.openremote-nic.private_ip_address
     } : {
     name       = azurerm_linux_virtual_machine.openremote-vm.name
-    public_ip  = azurerm_public_ip.openremote-ip[0].ip_address
     private_ip = azurerm_network_interface.openremote-nic.private_ip_address
   }
 } 
