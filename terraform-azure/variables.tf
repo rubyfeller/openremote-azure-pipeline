@@ -28,11 +28,6 @@ variable "tenant_id" {
   type        = string
 }
 
-variable "user_principal_name" {
-  description = "User Principal Name"
-  type        = string
-}
-
 variable "enable_backups" {
   description = "Enable backups"
   type        = bool
