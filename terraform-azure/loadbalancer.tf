@@ -93,3 +93,7 @@ resource "azurerm_lb_probe" "https_probe" {
   protocol        = "Tcp"
   port            = 443
 }
+
+output "lb-ip" {
+  value = var.enable_private_vm_setup ? azurerm_public_ip.openremote-lb-ip[0].ip_address : null
+}

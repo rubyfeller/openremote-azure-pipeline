@@ -1,3 +1,9 @@
+locals {
+  vm_custom_data = base64encode(templatefile("${path.module}/customdata.tpl", {
+    public_ip_tf = var.enable_private_vm_setup ? azurerm_public_ip.openremote-lb-ip[0].ip_address : azurerm_public_ip.openremote-ip[0].ip_address
+  }))
+} 
+
 resource "azurerm_resource_group" "openremote-rg" {
   name     = "${var.customer_name}-rg"
   location = var.region
@@ -177,8 +183,8 @@ resource "azurerm_public_ip" "openremote-ip" {
   name                = "openremote-ip"
   resource_group_name = azurerm_resource_group.openremote-rg.name
   location            = azurerm_resource_group.openremote-rg.location
-  allocation_method   = "Dynamic"
-  sku                 = "Basic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_network_interface" "openremote-nic" {
@@ -211,7 +217,7 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
     azurerm_network_interface.openremote-nic.id,
   ]
 
-  custom_data = filebase64("customdata.tpl")
+  custom_data =  local.vm_custom_data
 
   admin_ssh_key {
     username   = "adminuser"
@@ -229,14 +235,18 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
     sku       = "22_04-lts"
     version   = "latest"
   }
+
+  depends_on = [ local.vm_custom_data ]
 }
 
 output "instance_details" {
   value = var.enable_private_vm_setup ? {
     name       = azurerm_linux_virtual_machine.openremote-vm.name
+    public_ip = azurerm_public_ip.openremote-lb-ip[0].ip_address
     private_ip = azurerm_network_interface.openremote-nic.private_ip_address
     } : {
     name       = azurerm_linux_virtual_machine.openremote-vm.name
+    public_ip = azurerm_public_ip.openremote-ip[0].ip_address
     private_ip = azurerm_network_interface.openremote-nic.private_ip_address
   }
 } 
