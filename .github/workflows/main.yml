@@ -85,6 +85,7 @@ jobs:
           RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}tfstate-rg"
           STORAGE_ACCOUNT="${{ github.event.inputs.customer_name }}storage"
           CONTAINER_NAME="${{ github.event.inputs.customer_name }}container"
+          SERVICE_PRINCIPAL_ID="${{ secrets.SERVICE_PRINCIPAL_OBJECT_ID }}"
 
           # Create resource group if it doesn't exist
           az group show --name $RESOURCE_GROUP_NAME || \
@@ -98,7 +99,7 @@ jobs:
           az storage container show --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login || \
           az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login
 
-          az role assignment create --role Owner --principal $SERVICE_PRINCIPAL_OBJECT_ID --resource-group $RESOURCE_GROUP_NAME || true
+          az role assignment create --role Owner --principal $SERVICE_PRINCIPAL_ID --resource-group $RESOURCE_GROUP_NAME || true
           
       - name: Terraform Init
         id: init
