@@ -85,6 +85,7 @@ jobs:
           RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}tfstate-rg"
           STORAGE_ACCOUNT="${{ github.event.inputs.customer_name }}storage"
           CONTAINER_NAME="${{ github.event.inputs.customer_name }}container"
+          SUBSCRIPTION_ID="${{ secrets.AZURE_SUBSCRIPTION_ID }}"
           SERVICE_PRINCIPAL_ID="${{ secrets.SERVICE_PRINCIPAL_OBJECT_ID }}"
 
           # Create resource group if it doesn't exist
