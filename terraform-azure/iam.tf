@@ -2,19 +2,13 @@ data "azuread_domains" "default_domain" {
   only_default = true
 }
 
-resource "random_password" "random_admin_password" {
-  count   = var.enable_admin_account ? 1 : 0
-  length  = 16
-  special = true
-}
-
 resource "azuread_user" "admin_user" {
   count = var.enable_admin_account ? 1 : 0
 
   user_principal_name   = "admin@${data.azuread_domains.default_domain.domains[0].domain_name}"
   display_name          = "OpenRemote Admin"
   mail_nickname         = "admin"
-  password              = random_password.random_admin_password[count.index].result
+  password              = "OpenRemote123!"
   force_password_change = true
 }
 
@@ -29,7 +23,7 @@ resource "azurerm_role_assignment" "admin_user_assignment" {
 output "admin_credentials" {
   value = var.enable_admin_account ? {
     username = azuread_user.admin_user[0].user_principal_name
-    password = random_password.random_admin_password[0].result
+    password = azuread_user.admin_user[0].password
   } : null
   sensitive = true
 }
