@@ -23,6 +23,11 @@ variable "alert_email_address" {
   type        = string
 }
 
+variable "tenant_id" {
+  description = "Azure Tenant ID"
+  type        = string
+}
+
 variable "enable_backups" {
   description = "Enable backups"
   type        = bool
@@ -31,6 +36,18 @@ variable "enable_backups" {
 
 variable "enable_monitoring" {
   description = "Enable monitoring"
+  type        = bool
+  default     = false
+}
+
+variable "enable_admin_account" {
+  description = "Enable additional admin account"
+  type        = bool
+  default     = false
+}
+
+variable "enable_private_vm_setup" {
+  description = "Enable private VM setup"
   type        = bool
   default     = false
 }

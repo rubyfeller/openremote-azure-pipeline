@@ -17,6 +17,16 @@ on:
         required: true
         default: false
         type: boolean
+      enable_private_vm_setup:
+        description: 'Enable private VM setup'
+        required: true
+        default: false
+        type: boolean
+      admin_account:
+        description: 'Create an additional admin account'
+        required: true
+        default: false
+        type: boolean
       region:
         description: 'Azure region'
         required: true
@@ -75,7 +85,7 @@ jobs:
           RESOURCE_GROUP_NAME="${{ github.event.inputs.customer_name }}tfstate-rg"
           STORAGE_ACCOUNT="${{ github.event.inputs.customer_name }}storage"
           CONTAINER_NAME="${{ github.event.inputs.customer_name }}container"
-
+          
           # Create resource group if it doesn't exist
           az group show --name $RESOURCE_GROUP_NAME || \
           az group create --name $RESOURCE_GROUP_NAME --location ${{ github.event.inputs.region }}
@@ -87,7 +97,7 @@ jobs:
           # Create storage container if it doesn't exist
           az storage container show --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login || \
           az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login
-          
+
       - name: Terraform Init
         id: init
         env:
@@ -118,8 +128,11 @@ jobs:
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
           TF_VAR_enable_backups: ${{ github.event.inputs.enable_backups }}
           TF_VAR_enable_monitoring: ${{ github.event.inputs.enable_monitoring }}
+          TF_VAR_enable_admin_account: ${{ github.event.inputs.admin_account }}
+          TF_VAR_enable_private_vm_setup: ${{ github.event.inputs.enable_private_vm_setup }}
           TF_VAR_region: ${{ github.event.inputs.region }}
           TF_VAR_alert_email_address: ${{ github.event.inputs.email }}
         run: terraform plan -no-color
@@ -135,8 +148,11 @@ jobs:
           TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           TF_VAR_ssh_source_ip: ${{ secrets.SSH_SOURCE_IP }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+          TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
           TF_VAR_enable_backups: ${{ github.event.inputs.enable_backups }}
           TF_VAR_enable_monitoring: ${{ github.event.inputs.enable_monitoring }}
+          TF_VAR_enable_admin_account: ${{ github.event.inputs.admin_account }}
+          TF_VAR_enable_private_vm_setup: ${{ github.event.inputs.enable_private_vm_setup }}
           TF_VAR_region: ${{ github.event.inputs.region }}
           TF_VAR_alert_email_address: ${{ github.event.inputs.email }}
         run: terraform apply -no-color -auto-approve
