@@ -99,7 +99,7 @@ jobs:
           az storage container show --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login || \
           az storage container create --name $CONTAINER_NAME --account-name $STORAGE_ACCOUNT --auth-mode login
 
-          az role assignment create --role Owner --principal $SERVICE_PRINCIPAL_ID --resource-group $RESOURCE_GROUP_NAME || true
+          az role assignment create --role Owner --assignee-object-id $SERVICE_PRINCIPAL_OBJECT_ID --assignee-principal-type ServicePrincipal --scope /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP_NAME || true
           
       - name: Terraform Init
         id: init
