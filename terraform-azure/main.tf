@@ -174,6 +174,8 @@ resource "azurerm_linux_virtual_machine" "openremote-vm" {
   identity {
     type = "SystemAssigned"
   }
+
+  depends_on = [local.vm_custom_data]
 }
 
 resource "azurerm_virtual_machine_extension" "monitor_agent" {
