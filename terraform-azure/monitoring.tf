@@ -114,7 +114,7 @@ resource "azurerm_monitor_metric_alert" "vm_network_in_alert" {
   name                = "vm-high-network-in-alert"
   resource_group_name = azurerm_resource_group.openremote-rg.name
   scopes              = [azurerm_linux_virtual_machine.openremote-vm.id]
-  description         = "Alert when network in traffic is high"
+  description         = "Alert when disk free space is below 15%"
   frequency           = var.alert_frequency
   window_size         = var.alert_window_size
   auto_mitigate       = true
