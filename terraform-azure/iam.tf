@@ -8,7 +8,7 @@ resource "azuread_user" "admin_user" {
   user_principal_name   = "admin@${data.azuread_domains.default_domain.domains[0].domain_name}"
   display_name          = "OpenRemote Admin"
   mail_nickname         = "admin"
-  password              = "OpenRemote123!"
+  password              = local.admin_account_password
   force_password_change = true
 }
 
@@ -23,7 +23,6 @@ resource "azurerm_role_assignment" "admin_user_assignment" {
 output "admin_credentials" {
   value = var.enable_admin_account ? {
     username = azuread_user.admin_user[0].user_principal_name
-    password = azuread_user.admin_user[0].password
+    password = local.admin_account_password
   } : null
-  sensitive = true
 }

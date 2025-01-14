@@ -120,6 +120,43 @@ You have successfully set up the pipeline using GitHub Actions. You can now star
 
 For more information, refer to the [Terraform Azure Provider documentation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs) and the [GitHub Actions documentation](https://docs.github.com/en/actions).
 
+## Additional Security Features
+
+In the run workflow menu, you will find **two optional security features**:
+
+- Enable private VM setup
+- Create an additional admin account
+
+These optional features enhance the security of your infrastructure. Primarily used to minimize potential risks within the Azure environment and the IoT platform, enabling these options will also **increase your Azure infrastructure costs**.
+
+![GitHub Run Workflow Menu Image](./docs/img/Github-Actions-Workflow-Security.png)
+### Enable private VM setup
+
+By default, the OpenRemotes IoT platform is deployed in a public subnet with a public IP address, potentially exposing it to security risks. Enabling the "Enable private VM setup" option significantly enhances security by deploying the platform within a private network, drastically reducing the attack surface. This option is highly recommended for production environments or when dealing with sensitive data.
+
+This option modifies the architecture to include the following Azure resources:
+
+- **Virtual Machine in a Private Subnet without Public IP:** This is the core of the security enhancement. By removing the direct public IP, the IoT platform is no longer directly accessible from the internet, mitigating a major vulnerability.
+- **Load Balancer:**  The Load Balancer acts as the single point of entry for external traffic. It receives requests from the internet and redirects them to the private Virtual Machine. This allows users to access the platform without exposing the VM directly.
+- **NAT Gateway:**  While the Virtual Machine has no public IP, it still needs internet access for proper application functionality. The NAT Gateway provides this outbound internet access in a secure and managed way.
+- **Azure Bastion:** Instead of opening SSH ports directly to the internet, Azure Bastion provides a secure way to access the Virtual Machine's operating system for maintenance and troubleshooting. You can connect to the VM through the Azure Portal without exposing SSH ports publicly.
+
+Architecture diagram with private VM setup:
+![Architecture with Private VM Setup](./docs/img/GitHub-Actions-Terraform-Security.png) 
+
+### Create an additional admin account
+
+To enhance security and follow the principle of least privilege, this option creates a dedicated administrator account, **strongly discouraging the use of the root account for day-to-day management**. Using the root account for all activities increases the risk if those credentials are compromised, potentially leading to significant damage to your Azure environment. This practice aligns with security best practices by limiting the potential impact of a security breach.
+
+After the Terraform deployment completes, the following outputs will be provided:
+
+- **Administrator email:** `admin@<your_azure_default_domain>.com`
+- **Temporary Password:** `OpenRemote123!`
+
+**Immediately after deployment, use these credentials to log in to the Azure Portal.** Upon your first login with this administrator account, you will be **asked to change the temporary password to a strong, unique password and to set up Multi-Factor Authentication within 14 days.** Enabling MFA is crucial for adding an extra layer of security and protecting your account even if your password is compromised.
+
+This dedicated administrator account has the necessary permissions to manage your deployed infrastructure within the Azure Portal. **It is highly recommended that you use this account for all administrative tasks moving forward, reserving the root account exclusively for billing and critical, one-time administrative actions.**  Treat the root account credentials with extreme caution and store them securely.
+
 ## AWS setup comparison
 Terraform's modular approach makes it easier to scale and manage resources compared to bash scripts and CloudFormation.
 
