@@ -17,7 +17,7 @@ The [Abbreviation recommendations for Azure resources](https://learn.microsoft.c
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed
 - GitHub account
 
-## Step 1: Clone the Repository
+## Step 1: Clone the repository
 
 ```sh
 git clone https://github.com/rubyfeller/openremote-azure-pipeline.git
@@ -33,7 +33,7 @@ Log in to your Azure account using the Azure CLI:
 az login
 ```
 
-## Step 3: Set Up Terraform
+## Step 3: Set up Terraform
 
 Initialize Terraform:
 
@@ -41,26 +41,40 @@ Initialize Terraform:
 terraform init
 ```
 
-## Step 4: Configure OIDC Authentication
+## Step 4: Configure OIDC authentication
 
 [Azure Provider: Authenticating using a Service Principal with Open ID Connect](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_oidc)
 
-## Step 5: Store Secrets and variables in GitHub Repository
+## Step 5: Add role assignment
+Add the `Owner` and `User Access Administrator` roles to the service principal. 
+See the [Microsoft documentation](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-steps) on how to do this via the portal or CLI.
+
+Make sure to set the 'Assign access to' to 'User, group, or service principal' and search for the service principal if it doesn't show automatically.
+
+For 'What user can do', please select 'Allow user to assign all roles (highly privileged)'.
+
+## Step 6: Add Graph API permissions
+Go to Microsoft Entra ID and select `Enterprise applications`. Select the application. Click on `Permissions` and set the Microsoft Graph `Directory.Read.All` permission.
+
+For more information, refer to the [Microsoft documentation](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent?pivots=portal).
+
+## Step 7: Store secrets and variables in GitHub repository
 
 Go to your GitHub repository settings and add the following secrets:
 
 - `ARM_CLIENT_ID`: The application `clientId` from the Azure Entra (previously called Azure AD) App created in the previous step.
 - `ARM_SUBSCRIPTION_ID`: Your Azure subscription ID.
 - `ARM_TENANT_ID`: Your Azure tenant ID.
-- `RESOURCE_GROUP_NAME`: Name of the Azure resource group that will be created
-- `SSH_PUBLIC_KEY`: SSH key
-- `SSH_SOURCE_IP`: IP address that's allowed to SSH into virtual machine
-- `STORAGE_ACCOUNT`: Name of the Azure storage account that will be created (e.g. openremotestorage)
-- `CONTAINER_NAME`: Name of the container that will be created for storing the Terraform state (e.g. tfstate)
+- `RESOURCE_GROUP_NAME`: Name of the Azure resource group that will be created.
+- `SSH_PUBLIC_KEY`: SSH key.
+- `SSH_SOURCE_IP`: IP address that's allowed to SSH into virtual machine.
+- `STORAGE_ACCOUNT`: Name of the Azure storage account that will be created (e.g. openremotestorage).
+- `CONTAINER_NAME`: Name of the container that will be created for storing the Terraform state (e.g. tfstate).
+- `SERVICE_PRINCIPAL_OBJECT_ID`: Service Principal Object ID.
 
 The `TF_ACTIONS_WORKING_DIR` variable can be set in the `Repository variables`. It should specify the folder where your Terraform files are located. By default, it should point to `./terraform-azure`, as the path is relative to the `.github/workflows` folder.
 
-## Step 6: Add terraform.tfvars file
+## Step 8: Add terraform.tfvars file
 Add a terraform.tfvars file locally, in which at least the following variables should be added:
 
 ```go
@@ -71,7 +85,7 @@ alert_email_address = ""
 
 The other variables that are in `variables.tf` can also be added if you want to override the default values, for example to deploy in a different region.
 
-## Step 7: Add state_override.tf
+## Step 9: Add state_override.tf
 Add a state_override.tf file locally and add the following content:
 
 ```go
@@ -83,7 +97,7 @@ terraform {
 
 This configures Terraform to use a local backend for state mangement. It makes sure the remote state isn't affected.
 
-## Step 8: Apply Terraform Configuration
+## Step 10: Apply Terraform configuration
 
 Run the following command to apply the Terraform configuration:
 
@@ -93,7 +107,7 @@ terraform apply
 
 This will deploy OpenRemote in Azure using the local configuration.
 
-## Step 9: Deployment via GitHub Actions
+## Step 11: Deployment via GitHub Actions
 
 In the GitHub repository, go to the 'Actions' tab and select the 'Deploy OpenRemote' flow.
 In the top right corner, hit the 'Run workflow' button. Here you can enter the desired values and start the workflow, which will deploy OpenRemote to Azure:
@@ -138,9 +152,9 @@ In the setup for AWS, multiple accounts are created for isolation. In Azure, an 
 Azure Management Groups, Azure Policy, and Role-Based Access Control (RBAC) can be used for enforcing policies. Currently, multiple subscriptions are not supported. It's recommended to adapt the pipeline so it can support multiple subscriptions.
 
 #### Audit logging
-The [Azure Activity Log](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log-insights) can be used to see who did what and when. For example when a resource is modified or a virtual machine is started.
+The [Azure Activity Log](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/activity-log-insights) can be used to see who did what and when. For example when a resource is modified or a virtual machine is started. The Microsoft Entra Audit logs can be used to to see all events in Entra ID, such as what users were changed, if a service principal has been changed etc.
 
-The retention period for these logs is 90 days. It's therefore recommended to store the logs in Azure Log Analytics, a SIEM or Azure Storage account.
+The retention period for the activity logs is 90 days. The retention period for Entra Audit logs are 30 days, unless you have an Entra Premium P1 or P2 subscription. Then it can be extended to a maxiumum of 2 years (730 days). It's therefore recommended to store the logs in Azure Log Analytics, a SIEM or Azure Storage account.
 
  #### State drift
 It's important to handle everything via Terraform and not use the Azure portal.
