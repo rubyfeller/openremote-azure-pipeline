@@ -54,7 +54,7 @@ Make sure to set the 'Assign access to' to 'User, group, or service principal' a
 For 'What user can do', please select 'Allow user to assign all roles (highly privileged)'.
 
 ## Step 6: Add Graph API permissions
-Go to Microsoft Entra ID and select `Enterprise applications`. Select the application. Click on `Permissions` and set the Microsoft Graph `Directory.Read.All` permission.
+Go to Microsoft Entra ID and select `Enterprise applications`. Select the application. Click on `Permissions` and set the Microsoft Graph `Directory.Read.All` and `Directory.ReadWrite.All` permissions.
 
 For more information, refer to the [Microsoft documentation](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent?pivots=portal).
 
